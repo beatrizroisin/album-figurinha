@@ -1,0 +1,359 @@
+@use '../styles/global' as *;
+
+.wrapper {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.packNotif {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba($orange, 0.12);
+  border: 1px solid rgba($orange, 0.35);
+  border-radius: 12px;
+  padding: 8px 20px 8px 8px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  animation: pulse 2.2s ease-in-out infinite;
+
+  &:hover { background: rgba($orange, 0.2); transform: scale(1.02); }
+
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: $orange;
+  }
+}
+
+.packNotifImg {
+  width: 48px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+// ═══════════════════════════════════════════════════
+//  SCENE
+// ═══════════════════════════════════════════════════
+.bookScene {
+  width: 100%;
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.floorShadow {
+  position: absolute;
+  bottom: 0;
+  left: 12%; right: 12%;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.65) 0%, transparent 70%);
+  filter: blur(12px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+// ═══════════════════════════════════════════════════
+//  LIVRO
+// ═══════════════════════════════════════════════════
+.book {
+  display: flex;
+  width: 100%;
+    height: 780px;
+    max-height: 800px;
+  
+  position: relative;
+  border-radius: 6px 12px 12px 6px;
+  box-shadow:
+    0 28px 64px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  cursor: grab;
+  // perspective fica no elemento filho flyWrap para melhor controle
+  overflow: hidden; // importante: clipa a folha quando passa de 90°
+
+  &:active { cursor: grabbing; }
+}
+
+// ═══════════════════════════════════════════════════
+//  PÁGINAS ESTÁTICAS
+// ═══════════════════════════════════════════════════
+.pageLeft {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px 0 0 6px;
+  box-shadow: inset -3px 0 10px rgba(0,0,0,0.12);
+}
+
+.pageRight {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 12px 12px 0;
+  box-shadow: inset 3px 0 10px rgba(0,0,0,0.08);
+}
+
+.emptyPage {
+  width: 100%; height: 100%;
+  background: $album-page;
+  &.left  { border-radius: 6px 0 0 6px; }
+  &.right { border-radius: 0 12px 12px 0; }
+  &.full  { border-radius: 6px; }
+}
+
+// ═══════════════════════════════════════════════════
+//  LIVRO MOBILE (1 página por vez, sem lombada)
+// ═══════════════════════════════════════════════════
+.mBook {
+  width: 100%;
+  height: 545px;
+  min-height: 545px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow:
+    0 28px 64px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  cursor: grab;
+  overflow: hidden;
+
+  &:active { cursor: grabbing; }
+}
+
+.mFlyWrap {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  z-index: 10;
+}
+
+.mFlyFront {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.mFlyBack {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+
+// Sombras que a folha projeta nas páginas estáticas
+.pageShadowLeft {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 30%, transparent 70%);
+}
+
+.pageShadowRight {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 30%, transparent 70%);
+}
+
+// ═══════════════════════════════════════════════════
+//  LOMBADA
+// ═══════════════════════════════════════════════════
+.spine {
+  width: 22px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 6;
+  background: linear-gradient(
+    90deg,
+    #2a1006 0%,
+    #6B4F12 20%,
+    #9B7320 40%,
+    #C49A28 50%,
+    #9B7320 60%,
+    #6B4F12 80%,
+    #2a1006 100%
+  );
+  box-shadow: -3px 0 8px rgba(0,0,0,0.4), 3px 0 8px rgba(0,0,0,0.3);
+}
+
+.spineLines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 14px,
+    rgba(0,0,0,0.12) 14px, rgba(0,0,0,0.12) 16px
+  );
+}
+
+// Sombras internas do livro próximo à lombada
+.innerShadowL {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: calc(50% - 11px - 36px);
+  width: 36px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.18));
+  pointer-events: none;
+  z-index: 4;
+}
+
+.innerShadowR {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: calc(50% + 11px);
+  width: 36px;
+  background: linear-gradient(to left, transparent, rgba(0,0,0,0.14));
+  pointer-events: none;
+  z-index: 4;
+}
+
+// ═══════════════════════════════════════════════════
+//  FOLHA VOADORA (o elemento que faz o flip)
+// ═══════════════════════════════════════════════════
+.flyWrap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  // left e width vêm via style inline
+  transform-style: preserve-3d;
+  z-index: 10;
+  // transform-origin e transform vêm via style inline
+}
+
+// Frente da folha (face que estava visível antes de virar)
+.flyFront {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+// Verso da folha (rotacionado 180° — aparece depois de 90°)
+.flyBack {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+
+// Gradientes de curvatura do papel
+.flyGradientFront,
+.flyGradientBack {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+// ═══════════════════════════════════════════════════
+//  CAPA
+// ═══════════════════════════════════════════════════
+.capa {
+  width: 100%; height: 100%;
+  background: #0f1115 url('../../public/fotos/newcap3.png') center / 100% 100% no-repeat;
+  border-radius: 6px 0 0 6px;
+  box-sizing: border-box; position: relative; overflow: hidden;
+  &.full { border-radius: 10px; }
+}
+
+// ═══════════════════════════════════════════════════
+//  CONTRA-CAPA
+// ═══════════════════════════════════════════════════
+.contraCapa {
+  width: 100%; height: 100%;
+  background: linear-gradient(145deg, #0f3460, #16213e, #1a1a2e);
+  border-radius: 0 12px 12px 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; padding: 24px; box-sizing: border-box;
+  &.full { border-radius: 10px; }
+  span  { font-size: 28px; color: $orange; }
+  p     { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.45); text-align: center; line-height: 1.8; }
+  small { font-size: 10px; color: rgba($orange, 0.55); letter-spacing: 2px; }
+}
+
+// ═══════════════════════════════════════════════════
+//  CONTROLES
+// ═══════════════════════════════════════════════════
+.controls {
+  display: flex; align-items: center; gap: 16px; margin-top: 4px;
+}
+
+.arrow {
+  @include flex-center;
+  width: 44px; height: 44px; border-radius: 50%;
+  font-size: 22px;
+  border: 1px solid rgba($orange, 0.38);
+  background: rgba($orange, 0.14);
+  color: $orange;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 2px 10px rgba($orange, 0.15);
+  &:hover:not(.arrowOff) { opacity: 0.85; transform: scale(1.07); }
+  &.arrowOff {
+    border-color: rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.04);
+    color: #333; cursor: not-allowed; box-shadow: none;
+  }
+}
+
+.dots {
+  display: flex; gap: 6px; align-items: center;
+  flex-wrap: wrap; justify-content: center; max-width: 240px;
+}
+
+.dot {
+  width: 7px; height: 7px; border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  cursor: pointer;
+  transition: width 0.22s, background 0.22s;
+  &.dotActive { width: 24px; background: $orange; }
+}
+
+// ═══════════════════════════════════════════════════
+//  PROGRESSO
+// ═══════════════════════════════════════════════════
+.progress {
+  width: 100%; background: rgba(255,255,255,0.05);
+  border-radius: 10px; padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.progressLabel { font-size: 10px; color: #fff; white-space: nowrap; }
+.progressBar {
+  flex: 1; height: 7px; background: rgba(255,255,255,0.08);
+  border-radius: 999px; overflow: hidden;
+}
+.progressFill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, $orange, $orange-light);
+  transition: width 0.5s;
+}
+.progressCount { font-size: 10px; color: $orange; font-weight: 700; white-space: nowrap; }
+
+// ═══════════════════════════════════════════════════
+//  RESPONSIVE
+// ═══════════════════════════════════════════════════
+@media (max-width: $tablet) {
+  .book { min-height: 420px; }
+  .mBook { height: 420px; min-height: 420px; }
+  .spine { width: 16px; }
+  .innerShadowL, .innerShadowR { width: 24px; }
+}
+@media (max-width: $mobile) {
+  .book { min-height: 320px; }
+  .mBook { height: 440px; min-height: 320px; }
+  .spine { width: 10px; }
+}

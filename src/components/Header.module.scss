@@ -1,0 +1,229 @@
+@use '../styles/global' as *;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ed4715;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba($orange, 0.18);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// ── Logo ──
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  @include flex-center;
+  @include orange-gradient;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.logoTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.logoSub {
+  font-size: 10px;
+  color: #555;
+}
+
+// ── Badges ──
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 4px 26px;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba($orange, 0.12);
+  border: 1px solid rgba($orange, 0.3);
+  color: $orange;
+}
+
+.badgePurple {
+  background: rgba($purple, 0.12);
+  border-color: rgba($purple, 0.3);
+  color: $purple-light;
+}
+
+.badgeGold {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.badgeDim {
+  background: rgba(100, 116, 139, 0.1);
+  border-color: rgba(100, 116, 139, 0.2);
+  color: #475569;
+}
+
+// ── Nav ──
+.nav {
+  display: flex;
+  gap: 5px;
+}
+
+.navBtn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border: none;
+  padding: 6px 13px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.09); color: #fff; }
+
+  &.active {
+    background: #16082b;
+    color: #fff;
+  }
+}
+
+// ── Right side (nav + user) ───────────────────────────────────
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// ── User info ─────────────────────────────────────────────────
+.user {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 4px 4px 8px;
+  background: rgb(22 8 43);
+  border: 1px solid rgb(22 8 43);
+  border-radius: 999px;
+}
+
+.userAvatar {
+  @include flex-center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $orange-light, $orange-dark);
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ccc;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 13px;
+  @include flex-center;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba($red, 0.2);
+    color: #f87171;
+  }
+}
+
+// ── Menu hambúrguer (mobile) ──────────────────────────────────
+.menuToggle {
+  display: none;
+  // @include flex-center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgb(22 8 43);
+  border: 1px solid rgb(22 8 43);
+  color: $orange;
+  font-size: 23px;
+  flex-shrink: 0;
+  padding: 0px 5px;
+}
+
+.navMobile {
+  display: none;
+}
+
+@media (max-width: $tablet) {
+  .header  { padding: 8px 12px; position: relative; }
+  .badges  { display: none; }
+  .userName { display: none; }
+.right{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+}
+  .nav        { display: none; }
+  .menuToggle { display: flex; }
+
+  .navMobile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    background: rgba(22, 8, 43, 0.99);
+    border-bottom: 1px solid rgba($orange, 0.18);
+    z-index: 99;
+  }
+
+  .navMobileBtn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: none;
+    padding: 10px 13px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover { background: rgba(255, 255, 255, 0.09); }
+
+    &.active {
+      background: $orange;
+      color: #fff;
+    }
+  }
+}

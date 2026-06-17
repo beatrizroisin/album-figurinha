@@ -1,0 +1,77 @@
+@use '../styles/global' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 8px;
+}
+
+// ─── Info abaixo da foto ──────────────────────────────────────
+.info {
+  background: #FF6B00;
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 180px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.nome {
+  font-size: 15px;
+  font-weight: 900;
+  color: $ink;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.cargo {
+  font-size: 12px;
+  color: $ink-light;
+  text-align: center;
+}
+
+.setor {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-top: 2px;
+}
+
+.copies {
+  font-size: 11px;
+  color: #fff;
+  text-align: center;
+  margin-top: 2px;
+}
+
+// ─── Fechar ───────────────────────────────────────────────────
+.closeBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255,255,255,0.16); color: #fff; }
+}

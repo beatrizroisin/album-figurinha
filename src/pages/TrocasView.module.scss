@@ -1,0 +1,292 @@
+@use '../styles/global' as *;
+
+.wrapper {
+  max-width: 640px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+
+// ─── Menu ─────────────────────────────────────────────────────
+.menuGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.menuCard {
+  @include card-base;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border-color: rgba($orange, 0.35);
+  text-align: center;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255,255,255,0.07); }
+
+  strong { font-size: 14px; font-weight: 700; color: #fff; }
+  small  { font-size: 11px; color: #888; }
+}
+
+.menuCardPurple {
+  border-color: rgba($purple, 0.35);
+  background: rgba($purple, 0.08);
+}
+
+.menuIcon { font-size: 28px; }
+
+// ─── Seções ───────────────────────────────────────────────────
+.section {
+  @include card-base;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rowText {
+  font-size: 12px;
+  color: #fff;
+  b { color: #fff; }
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.code {
+  background: rgba($orange, 0.18);
+  color: $orange;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.cancelBtn {
+  background: rgba($red, 0.15);
+  border: 1px solid rgba($red, 0.3);
+  color: #f87171;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.7; }
+}
+
+.aceita {
+  font-size: 10px;
+  font-weight: 700;
+  color: $green;
+  background: rgba($green, 0.1);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+// ─── Flow (gerar / colar) ─────────────────────────────────────
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.flowHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h3 { font-size: 14px; font-weight: 700; color: #fff; }
+}
+
+.backBtn {
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  transition: background 0.15s;
+  &:hover { background: rgba(255,255,255,0.12); }
+}
+
+.steps {
+  display: flex;
+  gap: 6px;
+}
+
+.step {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s;
+
+  &.stepActive { background: $orange; }
+}
+
+.subtext {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
+  b { color: #fff; }
+}
+
+.empty {
+  color: #f87171;
+  font-size: 13px;
+  text-align: center;
+  padding: 24px;
+}
+
+// ─── Grid de figurinhas ───────────────────────────────────────
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gridScroll {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.gridItem {
+  cursor: pointer;
+  border-radius: 11px;
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color 0.15s;
+
+  &.selected { outline-color: $orange; }
+}
+
+// ─── Botão gerar ──────────────────────────────────────────────
+.gerarBtn {
+  @include orange-gradient;
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  align-self: center;
+  box-shadow: 0 4px 16px rgba($orange, 0.4);
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.88; }
+}
+
+// ─── Resultado do código ──────────────────────────────────────
+.codResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.codSummary {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.7;
+  text-align: center;
+  b { color: #fff; }
+}
+
+.codLabel { font-size: 11px; color: #fff; }
+
+.codBox {
+  background: rgba($orange, 0.15);
+  border: 2px solid $orange;
+  border-radius: 16px;
+  padding: 18px 40px;
+  text-align: center;
+
+  small {
+    display: block;
+    font-size: 10px;
+    color: #888;
+    margin-top: 6px;
+  }
+}
+
+.codValue {
+  font-size: 38px;
+  font-weight: 900;
+  color: $orange;
+  letter-spacing: 8px;
+  text-shadow: 0 0 20px rgba($orange, 0.4);
+}
+
+.copyBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s;
+  &:hover { background: rgba(255,255,255,0.13); }
+}
+
+// ─── Colar código ─────────────────────────────────────────────
+.colarBox {
+  @include card-base;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  p { font-size: 13px; color: #888; text-align: center; }
+}
+
+.codeInput {
+  background: rgba($orange, 0.1);
+  border: 2px solid rgba($orange, 0.4);
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 24px;
+  font-weight: 800;
+  color: $orange;
+  letter-spacing: 8px;
+  text-align: center;
+  outline: none;
+  width: 220px;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: $orange; }
+  &::placeholder { color: rgba($orange, 0.3); font-size: 16px; letter-spacing: 3px; }
+}
+
+@media (max-width: $mobile) {
+  .menuGrid { grid-template-columns: 1fr; }
+}

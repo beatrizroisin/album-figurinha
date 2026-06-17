@@ -1,0 +1,152 @@
+// ─── VARIÁVEIS ───────────────────────────────────────────────
+$orange:       #ed4715;
+$orange-light: #f2601f;
+$orange-dark:  #c73a0f;
+$gold:         #D4AF37;
+$gold-light:   #F0D060;
+$purple:       #7C3AED;
+$purple-light: #A78BFA;
+$green:        #10b981;
+$red:          #ef4444;
+
+// Álbum
+$album-page:   #FFFDF5;
+$album-line:   #E8DFC0;
+$spine:        #5C3A1E;
+$spine-gold:   #8B6914;
+
+// Texto
+$ink:          #1C1C1C;
+$ink-light:    #fff;
+
+// Bg
+$bg:           #16082b;
+$bg-card:      rgba(255, 255, 255, 0.04);
+$bg-border:    rgba(255, 255, 255, 0.08);
+
+// Setores
+$setor-crm:        #E91E63;
+$setor-cro:        #9C27B0;
+$setor-dev:        #2196F3;
+$setor-socios:     #FF6B00;
+$setor-marketing:  #FF5722;
+$setor-ux:         #00BCD4;
+$setor-atendimento:#4CAF50;
+$setor-comercial:  #FFC107;
+$setor-especial:   #7C3AED;
+
+// ─── BREAKPOINTS ─────────────────────────────────────────────
+$mobile:  480px;
+$tablet:  768px;
+$desktop: 1024px;
+
+// ─── MIXINS ──────────────────────────────────────────────────
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-base {
+  background: $bg-card;
+  border: 1px solid $bg-border;
+  border-radius: 14px;
+}
+
+@mixin orange-gradient {
+  background: linear-gradient(135deg, $orange-light, $orange, $orange-dark);
+}
+
+// ─── KEYFRAMES ───────────────────────────────────────────────
+@keyframes shake {
+  0%, 100% { transform: rotate(-2deg) translateX(-3px); }
+  25%       { transform: rotate(2deg) translateX(3px); }
+  50%       { transform: rotate(-1deg) translateX(-5px); }
+  75%       { transform: rotate(1deg) translateX(5px); }
+}
+
+@keyframes shimmerGlow {
+  0%, 100% { box-shadow: 0 0 14px 3px rgba(255, 215, 0, 0.33); }
+  50%       { box-shadow: 0 0 28px 8px rgba(255, 215, 0, 0.67); }
+}
+
+@keyframes holoShift {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes cardReveal {
+  0%   { transform: scale(0.4) rotateY(-90deg); opacity: 0; }
+  100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+
+@keyframes flipRight {
+  0%   { transform: perspective(1200px) rotateY(0); }
+  50%  { transform: perspective(1200px) rotateY(-9deg); }
+  100% { transform: perspective(1200px) rotateY(0); }
+}
+
+@keyframes flipLeft {
+  0%   { transform: perspective(1200px) rotateY(0); }
+  50%  { transform: perspective(1200px) rotateY(9deg); }
+  100% { transform: perspective(1200px) rotateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(1.06); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes tearDown {
+  from { transform: translateY(-120%) rotate(3deg); opacity: 0.7; }
+  to   { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+// ─── RESET & BASE ────────────────────────────────────────────
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Nunito', system-ui, sans-serif;
+  background: $bg;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+// ─── SCROLLBAR ───────────────────────────────────────────────
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #2d1550; border-radius: 999px; }
