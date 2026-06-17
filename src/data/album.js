@@ -58,13 +58,15 @@ export const TODOS = [
 
   // ── COMERCIAL & ATENDIMENTO (PÁGINA 5) ─────────────────────
   { id: 23, nome: 'Hellen',   cargo: 'Comercial Lead',setor: 'comercial', brilhante: true,   foto: '/fotos/helen.png' },
-  { id: 24, nome: 'Vanessa',   cargo: 'SDR',           setor: 'comercial', brilhante: true,  foto: '/fotos/vanessa.png' },
+  { id: 24, nome: 'Vanessa',   cargo: 'SDR',           setor: 'comercial', brilhante: true,  foto: '/fotos/van.png' },
   { id: 25, nome: 'Mari',   cargo: 'Inside Sales',  setor: 'comercial', brilhante: true,  foto: '/fotos/mari.png' },
 
   // ── ESPECIAIS (PÁGINAS 6 · 7 · 8) ────────────────────────────
   // Página 6 (slots 1–9)
   { id: 26, nome: 'ALMAH',   cargo: 'A família do CEO',       setor: 'especial', brilhante: true, foto: '/cromos/especial-01.png', especial: true },
   { id: 27, nome: 'ALMAH',       cargo: 'Os bichinhos do time',   setor: 'especial', brilhante: true, foto: '/cromos/especial-02.png', especial: true },
+    { id: 48, nome: 'ALMAH',       cargo: 'Os bichinhos do time',   setor: 'especial', brilhante: true, foto: '/cromos/especial-03.png', especial: true },
+      { id: 49, nome: 'ALMAH',       cargo: 'Os bichinhos do time',   setor: 'especial', brilhante: true, foto: '/cromos/especial-04.png', especial: true },
   { id: 28, nome: 'ALMAH',     cargo: 'Team Building 2023',     setor: 'especial', brilhante: true, foto: '/cromos/vip-cromo.png', especial: true },
   { id: 29, nome: 'Especial 4',       cargo: '',                        setor: 'especial', brilhante: true, foto: '/cromos/van-cromo.png', especial: true },
   { id: 30, nome: 'Especial 5',       cargo: '',                        setor: 'especial', brilhante: true, foto: '/cromos/tavares-cromo.png', especial: true },
