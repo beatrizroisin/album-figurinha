@@ -1,8 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Pacotinho from '../components/Pacotinho.jsx';
-import FigurinhaCard from '../components/FigurinhaCard.jsx';
 import styles from './PacotinhosView.module.scss';
 import { MAX_PACKS_DAY } from '../data/album.js';
+
+function calcTimeLeft() {
+  const now = new Date()
+  const midnight = new Date()
+  midnight.setUTCHours(24, 0, 0, 0)
+  const diff = Math.max(0, midnight - now)
+  return {
+    h: Math.floor(diff / 3600000),
+    m: Math.floor((diff % 3600000) / 60000),
+    s: Math.floor((diff % 60000) / 1000),
+  }
+}
+
+function Countdown() {
+  const [t, setT] = useState(calcTimeLeft)
+  useEffect(() => {
+    const id = setInterval(() => setT(calcTimeLeft()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <div className={styles.countdown}>
+      <p className={styles.countdownLabel}>Próximos pacotinhos em</p>
+      <div className={styles.countdownTime}>
+        <div className={styles.countdownUnit}>
+          <span>{String(t.h).padStart(2, '0')}</span>
+          <small>horas</small>
+        </div>
+        <span className={styles.countdownSep}>:</span>
+        <div className={styles.countdownUnit}>
+          <span>{String(t.m).padStart(2, '0')}</span>
+          <small>min</small>
+        </div>
+        <span className={styles.countdownSep}>:</span>
+        <div className={styles.countdownUnit}>
+          <span>{String(t.s).padStart(2, '0')}</span>
+          <small>seg</small>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function PacotinhosView({ restantes, cMap, onPackOpened }) {
   const [key, setKey] = useState(0); // força re-mount após abrir
@@ -36,12 +76,7 @@ export default function PacotinhosView({ restantes, cMap, onPackOpened }) {
       {/* Pacotinho */}
       <Pacotinho key={key} onComplete={handleComplete} disabled={restantes <= 0} cMap={cMap} />
 
-      {restantes <= 0 && (
-        <div className={styles.esgotado}>
-          Todos os pacotinhos de hoje foram abertos!<br />
-          <span>Volte amanhã para mais {MAX_PACKS_DAY} pacotinhos.</span>
-        </div>
-      )}
+      {restantes <= 0 && <Countdown />}
 
       {/* Dicas */}
       <div className={styles.dicas}>
