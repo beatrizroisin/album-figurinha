@@ -32,6 +32,22 @@
     min-width: 82px;
     height: 526px;
 }
+@media (max-width: $mobile) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .size-sm{
+    width: 140px;
+    min-width: 82px;
+    height: 180px;
+}
+.size-lg{
+    width: 295px;
+    min-width: 82px;
+    height: 370px;
+}
+}
 
 // ─── Estados ──────────────────────────────────────────────────
 .vazia   { opacity: 0.25; filter: grayscale(1); }
