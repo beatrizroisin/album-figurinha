@@ -438,13 +438,13 @@ export default function AlbumView({ cMap, onCard, restantes = 0, setView }) {
       </div>
 
       {/* PROGRESSO */}
-      <div className={styles.progress}>
+      {/* <div className={styles.progress}>
         <span className={styles.progressLabel}>Progresso</span>
         <div className={styles.progressBar}>
           <div className={styles.progressFill} style={{ width: `${(totalColetados / totalFuncs) * 100}%` }} />
         </div>
         <span className={styles.progressCount}>{totalColetados}/{totalFuncs}</span>
-      </div>
+      </div> */}
     </div>
   )
 }
