@@ -54,6 +54,8 @@ export const TODOS = [
   { id: 17, nome: 'Tavares',      cargo: 'CRO Analyst',   setor: 'cro',    brilhante: true,  foto: '/fotos/tavares.png' },
   { id: 18, nome: 'Maria Clara',      cargo: 'Marketing Lead',setor: 'marketing', brilhante: true,   foto: '/fotos/maria.png' },
   { id: 19, nome: 'Gabriel',    cargo: 'Social Media',  setor: 'marketing', brilhante: true,  foto: '/fotos/gabriel.png' },
+ { id: 20, nome: 'Isaias',    cargo: 'Social Media',  setor: 'marketing', brilhante: true,  foto: '/fotos/isaias.png' },
+{ id: 21, nome: 'Alex',    cargo: 'Social Media',  setor: 'marketing', brilhante: true,  foto: '/fotos/alex.png' },
 
 
   // ── COMERCIAL & ATENDIMENTO (PÁGINA 5) ─────────────────────
@@ -91,6 +93,8 @@ export const TODOS = [
   { id: 45, nome: 'Especial 20',      cargo: '',                        setor: 'especial', brilhante: true, foto: '/cromos/breno-cromo.png', especial: true },
   { id: 46, nome: 'Especial 21',      cargo: '',                        setor: 'especial', brilhante: true, foto: '/cromos/danilo-cromo.png', especial: true },
   { id: 47, nome: 'Especial 22',      cargo: '',                        setor: 'especial', brilhante: true, foto:'/cromos/bia-cromo.png', especial:true },
+{ id: 50, nome: 'Especial 23',      cargo: '',                        setor: 'especial', brilhante: true, foto: '/cromos/isaias-cromo.png', especial: true },
+  { id: 51, nome: 'Especial 24',      cargo: '',                        setor: 'especial', brilhante: true, foto:'/cromos/alex-cromo.png', especial:true },
 
 ];
 
