@@ -43,12 +43,13 @@ export const TODOS = [
   { id: 7,  nome: 'Felipe',           cargo: 'Dev',           setor: 'dev',    brilhante: true,  foto: '/fotos/felipe.png' },
 
   // ── UX & DESIGN (PÁGINA 3) ─────────────────────────────────
+    { id: 13, nome: 'Kerollen Milena',  cargo: 'Designer',      setor: 'ux',     brilhante: true, foto: '/fotos/keka.png' },
   { id: 11, nome: 'Helhi',            cargo: 'UX Lead',       setor: 'ux',     brilhante: true,  foto: '/fotos/helhi.png' },
   { id: 12, nome: 'Breno',            cargo: 'Designer',      setor: 'ux',     brilhante: true, foto: '/fotos/breno.png' },
-  { id: 13, nome: 'Kerollen Milena',  cargo: 'Designer',      setor: 'ux',     brilhante: true, foto: '/fotos/keka.png' },
   { id: 14, nome: 'Matheus Venâncio', cargo: 'Designer',      setor: 'ux',     brilhante: true, foto: '/fotos/matheus.png' },
 
   // ── CRM / CRO / MARKETING (PÁGINA 4) ───────────────────────
+  { id: 52, nome: 'Alex',    cargo: 'Social Media',  setor: 'marketing', brilhante: true,  foto: '/fotos/vick.png' },
   { id: 15, nome: 'Danilo',    cargo: 'CRM Manager',   setor: 'crm',    brilhante: true,   foto: '/fotos/danilo.png' },
   { id: 16, nome: 'Ste', cargo: 'CRO Lead',      setor: 'cro',    brilhante: true,   foto: '/fotos/ste.png' },
   { id: 17, nome: 'Tavares',      cargo: 'CRO Analyst',   setor: 'cro',    brilhante: true,  foto: '/fotos/tavares.png' },
