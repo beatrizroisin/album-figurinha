@@ -70,9 +70,7 @@ export default function PacotinhosView({ restantes, proximoReset, cMap, onPackOp
         })}
       </div>
 
-      {/* Pacotinho */}
-      {/* TEMP: disabled removido para teste de trocas */}
-      <Pacotinho key={key} onComplete={handleComplete} disabled={false} cMap={cMap} />
+      <Pacotinho key={key} onComplete={handleComplete} disabled={restantes <= 0} cMap={cMap} />
 
       {restantes <= 0 && proximoReset && <Countdown proximoReset={proximoReset} />}
 

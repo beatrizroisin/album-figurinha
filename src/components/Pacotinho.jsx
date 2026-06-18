@@ -195,7 +195,7 @@ export default function Pacotinho({ onComplete, disabled, cMap = {} }) {
           <p className={styles.hint}>Clique ou arraste pra cima para abrir</p>
         )}
         {disabled && (
-          <p className={styles.hintDisabled}>Volte amanhã para mais pacotinhos</p>
+          <p className={styles.hintDisabled}>Volte em 5 horas para mais pacotinhos</p>
         )}
       </div>
     )

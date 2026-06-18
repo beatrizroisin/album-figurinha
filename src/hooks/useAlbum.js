@@ -34,27 +34,22 @@ export function useAlbum() {
     setCMap(map)
   }
 
-  async function loadPacotes() {
-    const { data, error } = await supabase
-      .from('pacotes_dia')
-      .select('abertos_hoje, ultimo_reset')
-      .eq('user_id', user.id)
-      .single()
+  // localStorage evita depender do tipo da coluna no banco (date trunca o timestamp)
+  function getPackWindow() {
+    try { return JSON.parse(localStorage.getItem(`pack_window_${user.id}`)) ?? { start: 0, abertos: 0 } }
+    catch { return { start: 0, abertos: 0 } }
+  }
+  function setPackWindow(info) {
+    localStorage.setItem(`pack_window_${user.id}`, JSON.stringify(info))
+  }
 
-    if (error && error.code === 'PGRST116') {
-      setRestantes(MAX_PACKS_DAY)
-      setProximoReset(null)
-      return
-    }
-    if (error) { console.error(error); return }
-
-    const ultimoTs   = data.ultimo_reset ? new Date(data.ultimo_reset).getTime() : 0
-    const passouJanela = (Date.now() - ultimoTs) >= PACK_INTERVAL_MS
-    const abertos    = passouJanela ? 0 : (data.abertos_hoje ?? 0)
-
-    setRestantes(MAX_PACKS_DAY - abertos)
-    setProximoReset(!passouJanela && abertos >= MAX_PACKS_DAY
-      ? new Date(ultimoTs + PACK_INTERVAL_MS)
+  function loadPacotes() {
+    const { start, abertos } = getPackWindow()
+    const passouJanela = (Date.now() - start) >= PACK_INTERVAL_MS
+    const abertosAtual = passouJanela ? 0 : abertos
+    setRestantes(MAX_PACKS_DAY - abertosAtual)
+    setProximoReset(!passouJanela && abertosAtual >= MAX_PACKS_DAY
+      ? new Date(start + PACK_INTERVAL_MS)
       : null
     )
   }
@@ -63,40 +58,30 @@ export function useAlbum() {
   const addPack = useCallback(async (cards) => {
     if (!user) return
 
-    // 1. Insere as figurinhas na coleção
+    // Verifica limite da janela de 5h
+    const { start, abertos } = getPackWindow()
+    const passouJanela = (Date.now() - start) >= PACK_INTERVAL_MS
+    const abertosAtual = passouJanela ? 0 : abertos
+    if (abertosAtual >= MAX_PACKS_DAY) return
+
+    const novoStart  = passouJanela ? Date.now() : start
+    const novoAbertos = abertosAtual + 1
+    setPackWindow({ start: novoStart, abertos: novoAbertos })
+
+    // Insere as figurinhas na coleção
     const rows = cards.map(c => ({ user_id: user.id, figurinha_id: c.id }))
     const { error: errCol } = await supabase.from('colecao').insert(rows)
     if (errCol) { console.error(errCol); return }
 
-    // 2. Atualiza/cria o controle de pacotes (janela de 5h)
-    const agora = new Date()
-    const { data: existing } = await supabase
-      .from('pacotes_dia')
-      .select('abertos_hoje, ultimo_reset')
-      .eq('user_id', user.id)
-      .single()
-
-    const ultimoTs     = existing?.ultimo_reset ? new Date(existing.ultimo_reset).getTime() : 0
-    const passouJanela = (agora.getTime() - ultimoTs) >= PACK_INTERVAL_MS
-    const abertosAtuais = passouJanela ? 0 : (existing?.abertos_hoje ?? 0)
-    const novoTotal     = abertosAtuais + 1
-    const novoReset     = passouJanela ? agora.toISOString() : existing?.ultimo_reset
-
-    await supabase.from('pacotes_dia').upsert({
-      user_id:      user.id,
-      abertos_hoje: novoTotal,
-      ultimo_reset: novoReset,
-    }, { onConflict: 'user_id' })
-
-    // 3. Atualiza state local (sem re-fetch)
+    // Atualiza state local
     setCMap(prev => {
       const nm = { ...prev }
       cards.forEach(c => { nm[c.id] = (nm[c.id] ?? 0) + 1 })
       return nm
     })
     setRestantes(prev => Math.max(0, prev - 1))
-    if (novoTotal >= MAX_PACKS_DAY) {
-      setProximoReset(new Date(new Date(novoReset).getTime() + PACK_INTERVAL_MS))
+    if (novoAbertos >= MAX_PACKS_DAY) {
+      setProximoReset(new Date(novoStart + PACK_INTERVAL_MS))
     }
   }, [user])
 
