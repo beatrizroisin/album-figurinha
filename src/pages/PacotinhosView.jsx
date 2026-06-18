@@ -3,11 +3,8 @@ import Pacotinho from '../components/Pacotinho.jsx';
 import styles from './PacotinhosView.module.scss';
 import { MAX_PACKS_DAY } from '../data/album.js';
 
-function calcTimeLeft() {
-  const now = new Date()
-  const midnight = new Date()
-  midnight.setUTCHours(24, 0, 0, 0)
-  const diff = Math.max(0, midnight - now)
+function calcTimeLeft(proximoReset) {
+  const diff = Math.max(0, new Date(proximoReset) - new Date())
   return {
     h: Math.floor(diff / 3600000),
     m: Math.floor((diff % 3600000) / 60000),
@@ -15,12 +12,12 @@ function calcTimeLeft() {
   }
 }
 
-function Countdown() {
-  const [t, setT] = useState(calcTimeLeft)
+function Countdown({ proximoReset }) {
+  const [t, setT] = useState(() => calcTimeLeft(proximoReset))
   useEffect(() => {
-    const id = setInterval(() => setT(calcTimeLeft()), 1000)
+    const id = setInterval(() => setT(calcTimeLeft(proximoReset)), 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [proximoReset])
   return (
     <div className={styles.countdown}>
       <p className={styles.countdownLabel}>Próximos pacotinhos em</p>
@@ -44,7 +41,7 @@ function Countdown() {
   )
 }
 
-export default function PacotinhosView({ restantes, cMap, onPackOpened }) {
+export default function PacotinhosView({ restantes, proximoReset, cMap, onPackOpened }) {
   const [key, setKey] = useState(0); // força re-mount após abrir
 
   function handleComplete(cards) {
@@ -57,7 +54,7 @@ export default function PacotinhosView({ restantes, cMap, onPackOpened }) {
     <div className={styles.wrapper}>
       <div className={styles.intro}>
         <h2>Pacotinhos Diários</h2>
-        <p>{MAX_PACKS_DAY} pacotinhos por dia · 5 figurinhas cada</p>
+        <p>{MAX_PACKS_DAY} pacotinhos a cada 5 horas · 5 figurinhas cada</p>
       </div>
 
       {/* Slots visuais */}
@@ -74,9 +71,10 @@ export default function PacotinhosView({ restantes, cMap, onPackOpened }) {
       </div>
 
       {/* Pacotinho */}
-      <Pacotinho key={key} onComplete={handleComplete} disabled={restantes <= 0} cMap={cMap} />
+      {/* TEMP: disabled removido para teste de trocas */}
+      <Pacotinho key={key} onComplete={handleComplete} disabled={false} cMap={cMap} />
 
-      {restantes <= 0 && <Countdown />}
+      {restantes <= 0 && proximoReset && <Countdown proximoReset={proximoReset} />}
 
       {/* Dicas */}
       <div className={styles.dicas}>

@@ -5,15 +5,16 @@ import { useTrocas } from '../hooks/useAlbum.js'
 import styles from './TrocasView.module.scss'
 
 export default function TrocasView({ cMap, onTrade, showToast }) {
-  const { pendentes, historico, loading, criarTroca, cancelarTroca, resolverCodigo, confirmarTroca } = useTrocas()
+  const { pendentes, historico, loading, criarTroca, cancelarTroca, resolverCodigo, confirmarTroca } = useTrocas(onTrade, showToast)
 
   const [modo,      setModo]      = useState('menu')  // menu | gerar | colar
   const [etapa,     setEtapa]     = useState(1)
   const [oferta,    setOferta]    = useState(null)
   const [desejo,    setDesejo]    = useState(null)
-  const [codGerado, setCodGerado] = useState('')
-  const [codInput,  setCodInput]  = useState('')
-  const [saving,    setSaving]    = useState(false)
+  const [codGerado,     setCodGerado]     = useState('')
+  const [codInput,      setCodInput]      = useState('')
+  const [saving,        setSaving]        = useState(false)
+  const [pendingTrade,  setPendingTrade]  = useState(null) // { troca, empOferece, empDeseja }
 
   const repetidas = TODOS.filter(e => (cMap[e.id] ?? 0) > 1)
   const naoTenho  = TODOS.filter(e => (cMap[e.id] ?? 0) === 0)
@@ -36,6 +37,29 @@ export default function TrocasView({ cMap, onTrade, showToast }) {
     }
   }
 
+  // ── Executa a troca (após validações ok) ──
+  async function executarTroca(troca, empOferece) {
+    const eraNova = (cMap[troca.oferta_id] ?? 0) === 0  // verifica ANTES de aplicar
+    setSaving(true)
+    try {
+      await confirmarTroca(troca)
+      // oferta_id = o que A ofereceu = o que B recebe; desejo_id = o que A queria = o que B dá
+      await onTrade(troca.oferta_id, troca.desejo_id)
+      showToast(
+        eraNova
+          ? `${empOferece.nome} colada no álbum!`
+          : `${empOferece.nome} adicionada às repetidas`
+      )
+      setCodInput('')
+      setPendingTrade(null)
+      setModo('menu')
+    } catch {
+      showToast('Erro ao confirmar troca.', 'err')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   // ── Usar código ──
   async function handleUsarCodigo() {
     const cod = codInput.trim().toUpperCase()
@@ -45,15 +69,23 @@ export default function TrocasView({ cMap, onTrade, showToast }) {
       const troca = await resolverCodigo(cod)
       if (!troca) { showToast('Código inválido ou expirado', 'err'); return }
 
-      const empOferece = TODOS.find(e => e.id === troca.oferta_id)
-      const empDeseja  = TODOS.find(e => e.id === troca.desejo_id)
+      const empOferece = TODOS.find(e => e.id === troca.oferta_id) // o que vou RECEBER
+      const empDeseja  = TODOS.find(e => e.id === troca.desejo_id) // o que preciso DAR
       if (!empOferece || !empDeseja) { showToast('Figurinhas não encontradas', 'err'); return }
 
-      await confirmarTroca(troca)
-      await onTrade(troca.oferta_id, troca.desejo_id)
-      showToast(`Troca aceita! Você ganhou: ${empOferece.nome}`)
-      setCodInput('')
-      setModo('menu')
+      // Não tenho a figurinha para dar
+      if ((cMap[troca.desejo_id] ?? 0) === 0) {
+        showToast(`Você não tem "${empDeseja.nome}" para dar nessa troca`, 'err')
+        return
+      }
+
+      // Já tenho a figurinha que vou receber → pede confirmação
+      if ((cMap[troca.oferta_id] ?? 0) > 0) {
+        setPendingTrade({ troca, empOferece, empDeseja })
+        return
+      }
+
+      await executarTroca(troca, empOferece)
     } catch {
       showToast('Erro ao confirmar troca.', 'err')
     } finally {
@@ -200,23 +232,40 @@ export default function TrocasView({ cMap, onTrade, showToast }) {
       {modo === 'colar' && (
         <div className={styles.flow}>
           <div className={styles.flowHeader}>
-            <button className={styles.backBtn} onClick={() => setModo('menu')}>← Voltar</button>
-            <h3>Inserir código de troca</h3>
+            <button className={styles.backBtn} onClick={() => { setModo('menu'); setPendingTrade(null) }}>← Voltar</button>
+            <h3>{pendingTrade ? 'Confirmar troca' : 'Inserir código de troca'}</h3>
           </div>
-          <div className={styles.colarBox}>
-            <p>Cole o código que seu colega enviou:</p>
-            <input
-              className={styles.codeInput}
-              value={codInput}
-              onChange={e => setCodInput(e.target.value.toUpperCase())}
-              maxLength={6}
-              placeholder="EX: AB3X9K"
-              autoFocus
-            />
-            <button className={styles.gerarBtn} onClick={handleUsarCodigo} disabled={saving}>
-              {saving ? 'Verificando…' : 'Confirmar Troca ✓'}
-            </button>
-          </div>
+
+          {pendingTrade ? (
+            <div className={styles.colarBox}>
+              <p>⚠️ Você já tem <b>{pendingTrade.empOferece.nome}</b> no álbum.<br />Quer aceitar mesmo assim?</p>
+              <p className={styles.subtext}>
+                Você dá: <b>{pendingTrade.empDeseja.nome}</b><br />
+                Você recebe: <b>{pendingTrade.empOferece.nome}</b> (repetida)
+              </p>
+              <button className={styles.gerarBtn} onClick={() => executarTroca(pendingTrade.troca, pendingTrade.empOferece)} disabled={saving}>
+                {saving ? 'Confirmando…' : 'Sim, aceitar mesmo assim'}
+              </button>
+              <button className={styles.backBtn} style={{ marginTop: 8 }} onClick={() => setPendingTrade(null)}>
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <div className={styles.colarBox}>
+              <p>Cole o código que seu colega enviou:</p>
+              <input
+                className={styles.codeInput}
+                value={codInput}
+                onChange={e => setCodInput(e.target.value.toUpperCase())}
+                maxLength={6}
+                placeholder="EX: AB3X9K"
+                autoFocus
+              />
+              <button className={styles.gerarBtn} onClick={handleUsarCodigo} disabled={saving}>
+                {saving ? 'Verificando…' : 'Confirmar Troca ✓'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

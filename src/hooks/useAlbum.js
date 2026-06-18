@@ -1,18 +1,24 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { MAX_PACKS_DAY } from '../data/album.js'
+import { MAX_PACKS_DAY, TODOS } from '../data/album.js'
+
+const PACK_INTERVAL_MS = 5 * 60 * 60 * 1000  // 5 horas em ms
 
 // ─── Hook principal da coleção ────────────────────────────────
 export function useAlbum() {
   const { user } = useAuth()
-  const [cMap,      setCMap]      = useState({})   // { figurinha_id: count }
-  const [restantes, setRestantes] = useState(MAX_PACKS_DAY)
-  const [loading,   setLoading]   = useState(true)
+  const [cMap,         setCMap]         = useState({})
+  const [restantes,    setRestantes]    = useState(MAX_PACKS_DAY)
+  const [proximoReset, setProximoReset] = useState(null) // Date quando a próxima janela abre
+  const [loading,      setLoading]      = useState(true)
+
+  const cMapRef = useRef({})
+  useEffect(() => { cMapRef.current = cMap }, [cMap])
 
   // ── Carrega coleção do Supabase ──
   useEffect(() => {
-    if (!user) { setCMap({}); setRestantes(MAX_PACKS_DAY); setLoading(false); return }
+    if (!user) { setCMap({}); setRestantes(MAX_PACKS_DAY); setProximoReset(null); setLoading(false); return }
     setLoading(true)
     Promise.all([loadColecao(), loadPacotes()]).finally(() => setLoading(false))
   }, [user])
@@ -29,7 +35,6 @@ export function useAlbum() {
   }
 
   async function loadPacotes() {
-    const today = new Date().toISOString().slice(0, 10)
     const { data, error } = await supabase
       .from('pacotes_dia')
       .select('abertos_hoje, ultimo_reset')
@@ -37,14 +42,21 @@ export function useAlbum() {
       .single()
 
     if (error && error.code === 'PGRST116') {
-      // Linha ainda não existe → pacotes disponíveis
       setRestantes(MAX_PACKS_DAY)
+      setProximoReset(null)
       return
     }
     if (error) { console.error(error); return }
 
-    const abertos = data.ultimo_reset === today ? data.abertos_hoje : 0
+    const ultimoTs   = data.ultimo_reset ? new Date(data.ultimo_reset).getTime() : 0
+    const passouJanela = (Date.now() - ultimoTs) >= PACK_INTERVAL_MS
+    const abertos    = passouJanela ? 0 : (data.abertos_hoje ?? 0)
+
     setRestantes(MAX_PACKS_DAY - abertos)
+    setProximoReset(!passouJanela && abertos >= MAX_PACKS_DAY
+      ? new Date(ultimoTs + PACK_INTERVAL_MS)
+      : null
+    )
   }
 
   // ── Salva figurinhas abertas ──
@@ -56,21 +68,24 @@ export function useAlbum() {
     const { error: errCol } = await supabase.from('colecao').insert(rows)
     if (errCol) { console.error(errCol); return }
 
-    // 2. Atualiza/cria o controle de pacotes do dia
-    const today = new Date().toISOString().slice(0, 10)
+    // 2. Atualiza/cria o controle de pacotes (janela de 5h)
+    const agora = new Date()
     const { data: existing } = await supabase
       .from('pacotes_dia')
       .select('abertos_hoje, ultimo_reset')
       .eq('user_id', user.id)
       .single()
 
-    const abertosAtuais = existing?.ultimo_reset === today ? (existing.abertos_hoje ?? 0) : 0
-    const novoTotal = abertosAtuais + 1
+    const ultimoTs     = existing?.ultimo_reset ? new Date(existing.ultimo_reset).getTime() : 0
+    const passouJanela = (agora.getTime() - ultimoTs) >= PACK_INTERVAL_MS
+    const abertosAtuais = passouJanela ? 0 : (existing?.abertos_hoje ?? 0)
+    const novoTotal     = abertosAtuais + 1
+    const novoReset     = passouJanela ? agora.toISOString() : existing?.ultimo_reset
 
     await supabase.from('pacotes_dia').upsert({
       user_id:      user.id,
       abertos_hoje: novoTotal,
-      ultimo_reset: today,
+      ultimo_reset: novoReset,
     }, { onConflict: 'user_id' })
 
     // 3. Atualiza state local (sem re-fetch)
@@ -80,16 +95,20 @@ export function useAlbum() {
       return nm
     })
     setRestantes(prev => Math.max(0, prev - 1))
+    if (novoTotal >= MAX_PACKS_DAY) {
+      setProximoReset(new Date(new Date(novoReset).getTime() + PACK_INTERVAL_MS))
+    }
   }, [user])
 
   // ── Aplica troca (recebe uma, perde uma) ──
+  // Retorna true se a figurinha recebida era nova (não estava no álbum)
   const applyTrade = useCallback(async (recebidoId, entregueId) => {
-    if (!user) return
+    if (!user) return false
 
-    // Insere a que ganhou
+    const eraNova = (cMapRef.current[recebidoId] ?? 0) === 0
+
     await supabase.from('colecao').insert({ user_id: user.id, figurinha_id: recebidoId })
 
-    // Remove UMA instância da que entregou
     const { data: rows } = await supabase
       .from('colecao')
       .select('id')
@@ -101,30 +120,37 @@ export function useAlbum() {
       await supabase.from('colecao').delete().eq('id', rows[0].id)
     }
 
-    // Atualiza state local
     setCMap(prev => {
       const nm = { ...prev }
       nm[recebidoId] = (nm[recebidoId] ?? 0) + 1
       if ((nm[entregueId] ?? 0) > 0) nm[entregueId]--
       return nm
     })
+
+    return eraNova
   }, [user])
 
-  return { cMap, restantes, loading, addPack, applyTrade }
+  return { cMap, restantes, proximoReset, loading, addPack, applyTrade }
 }
 
 // ─── Hook de trocas ───────────────────────────────────────────
-export function useTrocas() {
+export function useTrocas(applyTrade, showToast) {
   const { user, profile } = useAuth()
   const [pendentes,  setPendentes]  = useState([]) // trocas que eu criei e estão pendentes
   const [historico,  setHistorico]  = useState([])
   const [loading,    setLoading]    = useState(true)
 
+  const applyTradeRef = useRef(applyTrade)
+  useEffect(() => { applyTradeRef.current = applyTrade }, [applyTrade])
+
+  const showToastRef = useRef(showToast)
+  useEffect(() => { showToastRef.current = showToast }, [showToast])
+
   useEffect(() => {
     if (!user) { setLoading(false); return }
     loadTrocas()
 
-    // Realtime: atualiza quando alguém aceita
+    // Realtime: re-verifica sempre que alguma troca mudar
     const channel = supabase
       .channel('trocas_changes')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'trocas' }, () => {
@@ -143,8 +169,45 @@ export function useTrocas() {
       .order('created_at', { ascending: false })
       .limit(50)
     if (error) { console.error(error); setLoading(false); return }
-    setPendentes(data.filter(t => t.status === 'pendente'))
-    setHistorico(data.filter(t => t.status !== 'pendente'))
+
+    const novasPendentes = data.filter(t => t.status === 'pendente')
+    const novoHistorico  = data.filter(t => t.status !== 'pendente')
+
+    // Aplica trocas aceitas que ainda não foram aplicadas à coleção.
+    // Usa localStorage para não re-aplicar ao recarregar a página.
+    // IMPORTANTE: grava no localStorage ANTES dos awaits para evitar
+    // que chamadas concorrentes (mount + realtime) apliquem duas vezes.
+    if (applyTradeRef.current) {
+      const storageKey  = `trocas_aplicadas_${user.id}`
+      const aplicadas   = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'))
+      const paraAplicar = novoHistorico.filter(t => t.status === 'aceita' && !aplicadas.has(t.id))
+
+      if (paraAplicar.length > 0) {
+        paraAplicar.forEach(t => aplicadas.add(t.id))
+        localStorage.setItem(storageKey, JSON.stringify([...aplicadas]))  // síncrono, antes dos awaits
+
+        for (const troca of paraAplicar) {
+          try {
+            const empRecebida = TODOS.find(e => e.id === troca.desejo_id)
+            const eraNova = await applyTradeRef.current(troca.desejo_id, troca.oferta_id)
+            if (showToastRef.current && empRecebida) {
+              showToastRef.current(
+                eraNova
+                  ? `Sua troca foi aceita! ${empRecebida.nome} colada no álbum!`
+                  : `Sua troca foi aceita! ${empRecebida.nome} adicionada às repetidas`
+              )
+            }
+          } catch {
+            // Se falhou, remove do localStorage para poder tentar de novo
+            aplicadas.delete(troca.id)
+            localStorage.setItem(storageKey, JSON.stringify([...aplicadas]))
+          }
+        }
+      }
+    }
+
+    setPendentes(novasPendentes)
+    setHistorico(novoHistorico)
     setLoading(false)
   }
 

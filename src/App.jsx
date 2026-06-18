@@ -15,7 +15,7 @@ import styles from './App.module.scss'
 // ── Inner app (só renderiza quando logado) ────────────────────
 function AlbumApp() {
   const { user, profile, signOut, loading: authLoading } = useAuth()
-  const { cMap, restantes, loading: albumLoading, addPack, applyTrade } = useAlbum()
+  const { cMap, restantes, proximoReset, loading: albumLoading, addPack, applyTrade } = useAlbum()
   const { toast, show: showToast } = useToast()
   const [view,     setView]     = useState('album')
   const [selected, setSelected] = useState(null)
@@ -50,7 +50,7 @@ function AlbumApp() {
 
       <main className={styles.main}>
         {view === 'album'     && <AlbumView      cMap={cMap} onCard={setSelected} restantes={restantes} setView={setView} />}
-        {view === 'pacotes'   && <PacotinhosView restantes={restantes} cMap={cMap} onPackOpened={handlePackOpened} />}
+        {view === 'pacotes'   && <PacotinhosView restantes={restantes} proximoReset={proximoReset} cMap={cMap} onPackOpened={handlePackOpened} />}
         {view === 'trocas'    && <TrocasView     cMap={cMap} onTrade={applyTrade} showToast={showToast} />}
         {view === 'repetidas' && <RepetidosView  cMap={cMap} onCard={setSelected} />}
       </main>
