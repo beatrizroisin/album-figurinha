@@ -25,7 +25,7 @@ export default function CardModal({ emp, qtd, onClose }) {
         <FigurinhaCard emp={emp} coletada qtd={qtd} size="lg" />
         <p className={styles.info}>
           {qtd > 1
-            ? `Você tem ${qtd} cópias — ${qtd - 1} disponível${qtd - 1 !== 1 ? 'eis' : ''} para troca!`
+            ? `Você tem ${qtd} cópias — ${qtd - 1} dispon${qtd - 1 !== 1 ? 'íveis' : 'ível'} para troca!`
             : 'Única cópia — guarde bem!'}
         </p>
         <div className={styles.actions}>
