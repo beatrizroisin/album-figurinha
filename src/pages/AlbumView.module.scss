@@ -278,6 +278,39 @@
 }
 
 // ═══════════════════════════════════════════════════
+//  LIVRO + SETAS LATERAIS (desktop)
+// ═══════════════════════════════════════════════════
+.bookRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  > .bookScene {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.arrowSide {
+  @include flex-center;
+  flex-shrink: 0;
+  width: 52px; height: 52px; border-radius: 50%;
+  font-size: 28px;
+  border: 1px solid rgb(237 71 21);
+  background: rgba($orange, 0.14);
+  color: $orange;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 2px 10px rgba($orange, 0.15);
+  &:hover:not(.arrowOff) { opacity: 0.85; transform: scale(1.08); }
+  &.arrowOff {
+    border-color: rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.04);
+    color: #333; cursor: not-allowed; box-shadow: none;
+  }
+}
+
+// ═══════════════════════════════════════════════════
 //  CONTROLES
 // ═══════════════════════════════════════════════════
 .controls {

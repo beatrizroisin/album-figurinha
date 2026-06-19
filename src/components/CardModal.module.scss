@@ -62,7 +62,28 @@
   margin-top: 2px;
 }
 
-// ─── Fechar ───────────────────────────────────────────────────
+// ─── Botões ───────────────────────────────────────────────────
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.downloadBtn {
+  background: rgba($orange, 0.18);
+  border: 1px solid rgba($orange, 0.45);
+  color: $orange;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover { background: rgba($orange, 0.3); transform: scale(1.03); }
+}
+
 .closeBtn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);

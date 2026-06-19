@@ -322,7 +322,13 @@ export default function AlbumView({ cMap, onCard, restantes = 0, setView }) {
     <div className={styles.wrapper}>
       {packNotif}
 
-      {/* LIVRO */}
+      {/* LIVRO COM SETAS NAS LATERAIS */}
+      <div className={styles.bookRow}>
+        <button
+          className={`${styles.arrowSide} ${spreadIdx === 0 || isFlipping ? styles.arrowOff : ''}`}
+          onClick={() => startFlip('left')}
+        >‹</button>
+
       <div className={styles.bookScene}>
         <div className={styles.floorShadow} />
 
@@ -417,24 +423,20 @@ export default function AlbumView({ cMap, onCard, restantes = 0, setView }) {
         </div>
       </div>
 
-      {/* CONTROLES */}
-      <div className={styles.controls}>
         <button
-          className={`${styles.arrow} ${spreadIdx === 0 || isFlipping ? styles.arrowOff : ''}`}
-          onClick={() => startFlip('left')}
-        >‹</button>
-        <div className={styles.dots}>
-          {Array.from({ length: total }).map((_, i) => (
-            <div key={i}
-              className={`${styles.dot} ${i === spreadIdx ? styles.dotActive : ''}`}
-              onClick={() => { if (!isFlipping && i !== spreadIdx) startFlip(i > spreadIdx ? 'right' : 'left') }}
-            />
-          ))}
-        </div>
-        <button
-          className={`${styles.arrow} ${spreadIdx >= total - 1 || isFlipping ? styles.arrowOff : ''}`}
+          className={`${styles.arrowSide} ${spreadIdx >= total - 1 || isFlipping ? styles.arrowOff : ''}`}
           onClick={() => startFlip('right')}
         >›</button>
+      </div>
+
+      {/* DOTS */}
+      <div className={styles.dots}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i}
+            className={`${styles.dot} ${i === spreadIdx ? styles.dotActive : ''}`}
+            onClick={() => { if (!isFlipping && i !== spreadIdx) startFlip(i > spreadIdx ? 'right' : 'left') }}
+          />
+        ))}
       </div>
 
       {/* PROGRESSO */}
