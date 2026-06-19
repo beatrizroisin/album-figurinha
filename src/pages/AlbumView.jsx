@@ -108,14 +108,18 @@ export default function AlbumView({ cMap, onCard, restantes = 0, setView }) {
   // A 1ª página de conteúdo vai na capa (direita) e a última vai na
   // contracapa (esquerda) — só as páginas "do meio" se repetem em pares.
   const n = sectorPages.length
-  const middlePages = n >= 2 ? sectorPages.slice(1, n - 1) : []
+  // Se o número de páginas do meio for ímpar, inclui a última página no meio
+  // para evitar uma página em branco no miolo do álbum — o branco fica ao lado da contra-capa
+  const hasOddMiddle = n >= 2 && (n - 2) % 2 !== 0
+  const middlePages = n >= 2 ? sectorPages.slice(1, hasOddMiddle ? n : n - 1) : []
+  const lastSpecialPage = hasOddMiddle ? null : (n >= 2 ? sectorPages[n - 1] : null)
   const totalSpreads = 1 + Math.ceil(middlePages.length / 2) + 1
 
   function getSpread(idx) {
     if (idx < 0 || idx >= totalSpreads) return { left: null, right: null }
     if (idx === 0) return { left: 'capa', right: sectorPages[0] ?? null }
     if (idx === totalSpreads - 1) return {
-      left:  n >= 2 ? sectorPages[n - 1] : null,
+      left:  lastSpecialPage,
       right: 'contra',
     }
     const li = (idx - 1) * 2
