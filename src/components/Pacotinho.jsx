@@ -166,7 +166,7 @@ export default function Pacotinho({ onComplete, disabled, cMap = {} }) {
               opacity: topOpacity,
             }}
           >
-            <img src="/fotos/newpac2.png" alt="pacote" draggable={false} />
+            <img src="https://agenciaalmah.com.br/wp-content/uploads/2026/06/newpac3.png" alt="pacote" draggable={false} />
           </div>
 
           {/* Corpo com a imagem — clip revela abertura */}
@@ -178,7 +178,7 @@ export default function Pacotinho({ onComplete, disabled, cMap = {} }) {
                 : 'none',
             }}
           >
-            <img src="/fotos/newpac2.png" alt="pacote" draggable={false} />
+            <img src="https://agenciaalmah.com.br/wp-content/uploads/2026/06/newpac3.png" alt="pacote" draggable={false} />
           </div>
 
           {/* Linha de rasgo */}

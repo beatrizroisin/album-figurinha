@@ -232,7 +232,7 @@ export default function AlbumView({ cMap, onCard, restantes = 0, setView }) {
 
   const packNotif = restantes > 0 && (
     <button className={styles.packNotif} onClick={() => setView?.('pacotes')}>
-      <img src="/fotos/newpac2.png" alt="" className={styles.packNotifImg} />
+      <img src="https://agenciaalmah.com.br/wp-content/uploads/2026/06/newpac3.png" alt="" className={styles.packNotifImg} />
       <span>
         {restantes} pacotinho{restantes > 1 ? 's' : ''} disponível{restantes > 1 ? 'is' : ''}!
       </span>
