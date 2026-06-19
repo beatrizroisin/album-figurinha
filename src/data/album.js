@@ -53,7 +53,7 @@ export const TODOS = [
   // ── MARKETING (PÁGINA 4) ────────────────────────────────────
   { id: 13, nome: 'Kerollen Milena',  cargo: 'Designer',      setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/keka.png',          peso: 3 },
   { id: 23, nome: 'Hellen',           cargo: 'Marketing',     setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/helen.png',         peso: 3 },
-   { id: 23, nome: 'Vick',           cargo: 'Marketing',     setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/vick.png',         peso: 3 },
+   { id: 60, nome: 'Vick',           cargo: 'Marketing',     setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/vick.png',         peso: 3 },
   { id: 18, nome: 'Maria Clara',      cargo: 'Marketing Lead',setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/maria.png',         peso: 3 },
   { id: 19, nome: 'Gabriel',          cargo: 'Social Media',  setor: 'marketing', brilhante: false, foto: 'https://agenciaalmah.com.br/wp-content/uploads/2026/06/gabriel.png',       peso: 3 },
 
