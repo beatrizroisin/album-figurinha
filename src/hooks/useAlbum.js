@@ -34,23 +34,25 @@ export function useAlbum() {
     setCMap(map)
   }
 
-  // localStorage evita depender do tipo da coluna no banco (date trunca o timestamp)
-  function getPackWindow() {
-    try { return JSON.parse(localStorage.getItem(`pack_window_${user.id}`)) ?? { start: 0, abertos: 0 } }
-    catch { return { start: 0, abertos: 0 } }
-  }
-  function setPackWindow(info) {
-    localStorage.setItem(`pack_window_${user.id}`, JSON.stringify(info))
-  }
+  // ── Lê o status de pacotes direto do banco (sem incrementar) ──
+  // Substitui o getPackWindow baseado em localStorage: agora a fonte
+  // de verdade é única (banco), então não importa o dispositivo/navegador.
+  async function loadPacotes() {
+    const { data, error } = await supabase.rpc('get_pack_status', {
+      p_user_id:   user.id,
+      p_max:       MAX_PACKS_DAY,
+      p_janela_ms: PACK_INTERVAL_MS,
+    })
+    if (error) { console.error(error); return }
 
-  function loadPacotes() {
-    const { start, abertos } = getPackWindow()
-    const passouJanela = (Date.now() - start) >= PACK_INTERVAL_MS
-    const abertosAtual = passouJanela ? 0 : abertos
-    setRestantes(MAX_PACKS_DAY - abertosAtual)
-    setProximoReset(!passouJanela && abertosAtual >= MAX_PACKS_DAY
-      ? new Date(start + PACK_INTERVAL_MS)
-      : null
+    const abertos = data?.abertos ?? 0
+    const inicio  = data?.inicio ? new Date(data.inicio) : null
+
+    setRestantes(MAX_PACKS_DAY - abertos)
+    setProximoReset(
+      inicio && abertos >= MAX_PACKS_DAY
+        ? new Date(inicio.getTime() + PACK_INTERVAL_MS)
+        : null
     )
   }
 
@@ -58,31 +60,43 @@ export function useAlbum() {
   const addPack = useCallback(async (cards) => {
     if (!user) return
 
-    // Verifica limite da janela de 5h
-    const { start, abertos } = getPackWindow()
-    const passouJanela = (Date.now() - start) >= PACK_INTERVAL_MS
-    const abertosAtual = passouJanela ? 0 : abertos
-    if (abertosAtual >= MAX_PACKS_DAY) return
+    // Incrementa atomicamente no banco — qualquer dispositivo/aba que
+    // chamar isso ao mesmo tempo é serializado pelo "for update" no SQL.
+    const { data, error: errInc } = await supabase.rpc('increment_pack_window', {
+      p_user_id:   user.id,
+      p_max:       MAX_PACKS_DAY,
+      p_janela_ms: PACK_INTERVAL_MS,
+    })
+    if (errInc) { console.error(errInc); return }
 
-    const novoStart  = passouJanela ? Date.now() : start
-    const novoAbertos = abertosAtual + 1
-    setPackWindow({ start: novoStart, abertos: novoAbertos })
+    // Já bateu o limite da janela — banco recusou o incremento
+    if (data?.bloqueado) {
+      const inicio = data.inicio ? new Date(data.inicio) : null
+      setRestantes(0)
+      if (inicio) setProximoReset(new Date(inicio.getTime() + PACK_INTERVAL_MS))
+      return
+    }
+
+    const abertosNovo = data?.abertos ?? 0
+    const inicio      = data?.inicio ? new Date(data.inicio) : null
 
     // Insere as figurinhas na coleção
     const rows = cards.map(c => ({ user_id: user.id, figurinha_id: c.id }))
     const { error: errCol } = await supabase.from('colecao').insert(rows)
     if (errCol) { console.error(errCol); return }
 
-    // Atualiza state local
+    // Atualiza state local com os valores reais vindos do banco
     setCMap(prev => {
       const nm = { ...prev }
       cards.forEach(c => { nm[c.id] = (nm[c.id] ?? 0) + 1 })
       return nm
     })
-    setRestantes(prev => Math.max(0, prev - 1))
-    if (novoAbertos >= MAX_PACKS_DAY) {
-      setProximoReset(new Date(novoStart + PACK_INTERVAL_MS))
-    }
+    setRestantes(Math.max(0, MAX_PACKS_DAY - abertosNovo))
+    setProximoReset(
+      abertosNovo >= MAX_PACKS_DAY && inicio
+        ? new Date(inicio.getTime() + PACK_INTERVAL_MS)
+        : null
+    )
   }, [user])
 
   // ── Aplica troca (recebe uma, perde uma) ──
@@ -119,6 +133,7 @@ export function useAlbum() {
 }
 
 // ─── Hook de trocas ───────────────────────────────────────────
+// (sem alterações nesta etapa — continua igual ao original)
 export function useTrocas(applyTrade, showToast) {
   const { user, profile } = useAuth()
   const [pendentes,  setPendentes]  = useState([]) // trocas que eu criei e estão pendentes
