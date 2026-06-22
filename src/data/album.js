@@ -145,14 +145,14 @@ export function sortearPacote(cMap = {}) {
     return candidatos[candidatos.length - 1];
   }
 
- for (let i = 0; i < STICKERS_PER_PACK; i++) {
+for (let i = 0; i < STICKERS_PER_PACK; i++) {
     const r = Math.random();
     let picked;
-    // especiais: ~10% por carta → ~0,5 por pacote (≈1 especial a cada 2 pacotes)
+    // especiais: ~20% por carta → ~1,0 por pacote (≈1 especial garantida por pacote)
     // brilhantes (peso 1): ~5% por carta → ~0,25 por pacote (≈1 brilhante a cada 4 pacotes)
-    // comuns: ~85% por carta
-    if (r < 0.10 && especiais.length)       picked = pickFrom(especiais);
-    else if (r < 0.15 && brilhantes.length) picked = pickFrom(brilhantes);
+    // comuns: ~75% por carta
+    if (r < 0.20 && especiais.length)       picked = pickFrom(especiais);
+    else if (r < 0.25 && brilhantes.length) picked = pickFrom(brilhantes);
     else                                     picked = pickFrom(fallback);
 
     if (!picked) continue;
